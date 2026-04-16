@@ -752,7 +752,7 @@ textarea {
   }
 
   .app-stage {
-    padding: 20px 14px 44px;
+    padding: 110px 14px 44px;
   }
 
   .auth-showcase,
@@ -780,14 +780,16 @@ textarea {
   .mobile-floating-nav {
     display: flex;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 14px 20px;
-    background: rgba(255, 241, 236, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(181, 130, 140, 0.15);
+    top: 16px;
+    left: 14px;
+    right: 14px;
+    padding: 12px 18px;
+    border-radius: 99px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+    backdrop-filter: blur(24px) saturate(145%);
+    -webkit-backdrop-filter: blur(24px) saturate(145%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 16px 40px rgba(96, 64, 72, 0.16);
     z-index: 1000;
     justify-content: space-between;
     align-items: center;
