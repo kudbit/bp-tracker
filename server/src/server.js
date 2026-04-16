@@ -31,7 +31,7 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
-const moodOptions = ["Calm", "Balanced", "Focused", "Stressed", "Tired"];
+
 
 const userSchema = new mongoose.Schema(
   {
@@ -74,9 +74,7 @@ const entrySchema = new mongoose.Schema(
     systolic: { type: Number, required: true, min: 60, max: 250 },
     diastolic: { type: Number, required: true, min: 40, max: 180 },
     pulse: { type: Number, min: 30, max: 220 },
-    weight: { type: Number, min: 20, max: 400 },
     medicationTaken: { type: Boolean, default: true },
-    mood: { type: String, enum: moodOptions, default: "Balanced" },
     symptoms: { type: [String], default: [] },
     notes: { type: String, trim: true, maxlength: 450 },
   },
@@ -136,7 +134,6 @@ function buildSummary(entries) {
   const systolicAverage = average(sortedEntries.map((entry) => entry.systolic));
   const diastolicAverage = average(sortedEntries.map((entry) => entry.diastolic));
   const pulseAverage = average(sortedEntries.map((entry) => entry.pulse).filter(Boolean));
-  const weightAverage = average(sortedEntries.map((entry) => entry.weight).filter(Boolean));
   const missedMedication = sortedEntries.filter((entry) => !entry.medicationTaken).length;
   const medicationAdherence = totalReadings
     ? Math.round(((totalReadings - missedMedication) / totalReadings) * 100)
@@ -186,7 +183,6 @@ function buildSummary(entries) {
       avgSystolic: systolicAverage,
       avgDiastolic: diastolicAverage,
       avgPulse: pulseAverage,
-      avgWeight: weightAverage,
       missedMedication,
       medicationAdherence,
       recentCheckIns: recentWindow.length,
@@ -324,9 +320,7 @@ app.post("/api/entries", requireAuth, async (request, response) => {
       systolic,
       diastolic,
       pulse,
-      weight,
       medicationTaken,
-      mood,
       symptoms,
       notes,
     } = request.body;
@@ -348,9 +342,7 @@ app.post("/api/entries", requireAuth, async (request, response) => {
       systolic,
       diastolic,
       pulse: pulse || undefined,
-      weight: weight || undefined,
       medicationTaken: Boolean(medicationTaken),
-      mood: moodOptions.includes(mood) ? mood : "Balanced",
       symptoms: parsedSymptoms,
       notes,
     });
