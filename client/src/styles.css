@@ -763,7 +763,15 @@ textarea {
     border-radius: 24px;
   }
 
-  .topbar,
+  .topbar {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .topbar-actions {
+    justify-content: space-between;
+  }
+
   .section-heading,
   .history-item {
     flex-direction: column;
