@@ -480,6 +480,10 @@ textarea {
   gap: 14px;
 }
 
+.mobile-floating-nav {
+  display: none;
+}
+
 .profile-badge {
   width: 54px;
   height: 54px;
@@ -762,20 +766,31 @@ textarea {
     padding: 22px;
     border-radius: 24px;
   }
-
-  .topbar {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
-  .topbar-actions {
-    justify-content: space-between;
-  }
-
+  .topbar,
   .section-heading,
   .history-item {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-floating-nav {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 20px;
+    background: rgba(255, 241, 236, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(181, 130, 140, 0.15);
+    z-index: 1000;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .stats-grid,
