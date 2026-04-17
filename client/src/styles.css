@@ -51,7 +51,7 @@ textarea {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  padding: 40px 20px;
+  padding: 110px 20px 40px;
 }
 
 .app-stage--dashboard {
@@ -480,8 +480,24 @@ textarea {
   gap: 14px;
 }
 
-.mobile-floating-nav {
-  display: none;
+.floating-nav {
+  display: flex;
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 28px);
+  max-width: 1280px;
+  padding: 12px 18px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 16px 40px rgba(96, 64, 72, 0.16);
+  z-index: 1000;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .profile-badge {
@@ -771,28 +787,6 @@ textarea {
   .history-item {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .desktop-only {
-    display: none !important;
-  }
-
-  .mobile-floating-nav {
-    display: flex;
-    position: fixed;
-    top: 16px;
-    left: 14px;
-    right: 14px;
-    padding: 12px 18px;
-    border-radius: 99px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
-    backdrop-filter: blur(24px) saturate(145%);
-    -webkit-backdrop-filter: blur(24px) saturate(145%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 16px 40px rgba(96, 64, 72, 0.16);
-    z-index: 1000;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .stats-grid,

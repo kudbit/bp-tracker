@@ -545,28 +545,19 @@ function DashboardPage() {
       <div className="floating-orb floating-orb--right" />
 
       <main className="dashboard-shell">
-        <div className="mobile-floating-nav">
+        <nav className="floating-nav">
           <div className="profile-badge">
             <span>{user?.name?.slice(0, 1) || "U"}</span>
           </div>
           <button className="ghost-button" onClick={logout} type="button">
             Log out
           </button>
-        </div>
+        </nav>
 
         <header className="glass-panel topbar">
           <div>
             <span className="eyebrow">Personal dashboard</span>
             <h1>Hi {user?.name?.split(" ")[0]}, hope you are doing great.</h1>
-          </div>
-
-          <div className="topbar-actions desktop-only">
-            <div className="profile-badge">
-              <span>{user?.name?.slice(0, 1) || "U"}</span>
-            </div>
-            <button className="ghost-button" onClick={logout} type="button">
-              Log out
-            </button>
           </div>
         </header>
 
