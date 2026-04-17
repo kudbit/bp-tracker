@@ -51,10 +51,11 @@ textarea {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  padding: 110px 20px 40px;
+  padding: 60px 20px 40px;
 }
 
 .app-stage--dashboard {
+  padding-top: 110px;
   padding-bottom: 64px;
 }
 
@@ -150,7 +151,6 @@ textarea {
 }
 
 .auth-showcase {
-  min-height: 640px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -770,8 +770,12 @@ textarea {
     height: 56px;
   }
 
-  .app-stage {
+  .app-stage--dashboard {
     padding: 110px 14px 44px;
+  }
+
+  .app-stage {
+    padding: 40px 14px 44px;
   }
 
   .auth-showcase,
