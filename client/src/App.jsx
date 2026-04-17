@@ -263,11 +263,6 @@ function AuthPage({ mode }) {
         <section className="glass-panel auth-showcase">
           <span className="eyebrow">PulseGlass</span>
           <h1>Track blood pressure with a softer, calmer daily ritual.</h1>
-          <p className="auth-copy">
-            Built from your original tracker concept, now reimagined as a multi-user MERN
-            application with secure accounts, trend visuals, adherence insights, and a liquid-glass
-            interface.
-          </p>
 
           <div className="showcase-features">
             <div className="feature-item">
@@ -361,7 +356,15 @@ function AuthPage({ mode }) {
               {error ? <p className="form-error">{error}</p> : null}
             </div>
 
-            <button className="primary-button" disabled={isSubmitting} type="submit">
+            <button
+              className={`primary-button ${
+                (mode === "register" ? form.name && form.email && form.password.length >= 6 : form.email && form.password.length >= 6)
+                  ? "primary-button--ready"
+                  : ""
+              }`}
+              disabled={isSubmitting}
+              type="submit"
+            >
               {isSubmitting
                 ? "Please wait..."
                 : mode === "register"
