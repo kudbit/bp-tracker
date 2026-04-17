@@ -5,6 +5,8 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  ReferenceLine,
+  ReferenceArea,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -969,64 +971,203 @@ function DashboardPage() {
                 <span className="eyebrow">Trend view</span>
                 <h3>Blood pressure over time</h3>
               </div>
+              {summary?.trends?.length ? (
+                <div className="chart-legend">
+                  <span className="chart-legend__item chart-legend__item--sys">
+                    <span className="chart-legend__dot" />
+                    Systolic
+                  </span>
+                  <span className="chart-legend__item chart-legend__item--dia">
+                    <span className="chart-legend__dot" />
+                    Diastolic
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             <div className="chart-wrap">
               {summary?.trends?.length ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={summary.trends} margin={{ top: 10, right: 10, left: -24, bottom: 0 }}>
+                  <AreaChart
+                    data={summary.trends}
+                    margin={{ top: 12, right: 16, left: -18, bottom: 4 }}
+                  >
                     <defs>
+                      {/* Systolic gradient — warm coral */}
                       <linearGradient id="sysGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#FFB4A2" stopOpacity={0.35} />
-                        <stop offset="100%" stopColor="#FFB4A2" stopOpacity={0} />
+                        <stop offset="0%"   stopColor="#FF9B86" stopOpacity={0.55} />
+                        <stop offset="50%"  stopColor="#FFB4A2" stopOpacity={0.22} />
+                        <stop offset="100%" stopColor="#FFB4A2" stopOpacity={0}    />
                       </linearGradient>
+                      {/* Diastolic gradient — deep mauve */}
                       <linearGradient id="diaGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#B5828C" stopOpacity={0.25} />
-                        <stop offset="100%" stopColor="#B5828C" stopOpacity={0} />
+                        <stop offset="0%"   stopColor="#8B6471" stopOpacity={0.4}  />
+                        <stop offset="55%"  stopColor="#B5828C" stopOpacity={0.14} />
+                        <stop offset="100%" stopColor="#B5828C" stopOpacity={0}    />
                       </linearGradient>
+                      {/* Glow filter for active dots */}
+                      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
                     </defs>
-                    <CartesianGrid stroke="rgba(181, 130, 140, 0.18)" strokeDasharray="4 4" vertical={false} />
-                    <XAxis 
-                      dataKey="label" 
-                      tickLine={false} 
-                      axisLine={false} 
-                      tickMargin={14}
-                      tick={{ fill: "#8B6471", fontSize: 12, fontWeight: 600 }}
+
+                    {/* ── Clinical reference zones ─────────────────────── */}
+                    {/* Normal systolic zone (below 120) */}
+                    <ReferenceArea
+                      y1={60}  y2={120}
+                      fill="rgba(93, 135, 99, 0.045)"
+                      strokeOpacity={0}
                     />
-                    <YAxis 
-                      tickLine={false} 
-                      axisLine={false} 
-                      tickMargin={12}
-                      domain={["dataMin - 10", "dataMax + 10"]} 
-                      tick={{ fill: "#8B6471", fontSize: 12, fontWeight: 600 }}
+                    {/* Elevated systolic zone (120–130) */}
+                    <ReferenceArea
+                      y1={120} y2={130}
+                      fill="rgba(185, 122, 88, 0.055)"
+                      strokeOpacity={0}
                     />
+                    {/* High systolic zone (130+) */}
+                    <ReferenceArea
+                      y1={130} y2={200}
+                      fill="rgba(166, 76, 93, 0.04)"
+                      strokeOpacity={0}
+                    />
+
+                    <CartesianGrid
+                      stroke="rgba(181, 130, 140, 0.12)"
+                      strokeDasharray="6 4"
+                      vertical={false}
+                    />
+
+                    <XAxis
+                      dataKey="label"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={16}
+                      tick={{ fill: "#9A7480", fontSize: 11.5, fontWeight: 700, fontFamily: "Manrope, sans-serif" }}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={10}
+                      width={44}
+                      domain={["dataMin - 12", "dataMax + 12"]}
+                      tick={{ fill: "#9A7480", fontSize: 11.5, fontWeight: 700, fontFamily: "Manrope, sans-serif" }}
+                    />
+
+                    {/* ── Clinical reference lines ─────────────────────── */}
+                    <ReferenceLine
+                      y={120}
+                      stroke="rgba(185, 122, 88, 0.45)"
+                      strokeDasharray="5 4"
+                      strokeWidth={1.5}
+                      label={{ value: "120", position: "insideTopRight", fill: "#B97A58", fontSize: 10, fontWeight: 700, dy: -4 }}
+                    />
+                    <ReferenceLine
+                      y={80}
+                      stroke="rgba(93, 135, 99, 0.45)"
+                      strokeDasharray="5 4"
+                      strokeWidth={1.5}
+                      label={{ value: "80", position: "insideTopRight", fill: "#5d8763", fontSize: 10, fontWeight: 700, dy: -4 }}
+                    />
+
+                    {/* ── Custom Tooltip ───────────────────────────────── */}
                     <Tooltip
-                      contentStyle={{
-                        borderRadius: 16,
-                        border: "1px solid rgba(255,255,255,0.7)",
-                        background: "rgba(255,255,255,0.92)",
-                        boxShadow: "0 16px 32px rgba(96, 64, 72, 0.12)",
-                        padding: "12px 18px",
+                      cursor={{ stroke: "rgba(181,130,140,0.25)", strokeWidth: 1.5, strokeDasharray: "4 3" }}
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload?.length) return null;
+                        const sys = payload.find(p => p.dataKey === "avgSystolic")?.value;
+                        const dia = payload.find(p => p.dataKey === "avgDiastolic")?.value;
+                        const cat = sys && dia ? classifyReading(Math.round(sys), Math.round(dia)) : null;
+                        return (
+                          <div className="chart-tooltip">
+                            <p className="chart-tooltip__label">{label}</p>
+                            <div className="chart-tooltip__rows">
+                              <div className="chart-tooltip__row">
+                                <span className="chart-tooltip__swatch chart-tooltip__swatch--sys" />
+                                <span className="chart-tooltip__key">Systolic</span>
+                                <strong className="chart-tooltip__val">{sys ? Math.round(sys) : "--"}</strong>
+                                <span className="chart-tooltip__unit">mmHg</span>
+                              </div>
+                              <div className="chart-tooltip__row">
+                                <span className="chart-tooltip__swatch chart-tooltip__swatch--dia" />
+                                <span className="chart-tooltip__key">Diastolic</span>
+                                <strong className="chart-tooltip__val">{dia ? Math.round(dia) : "--"}</strong>
+                                <span className="chart-tooltip__unit">mmHg</span>
+                              </div>
+                            </div>
+                            {cat && (
+                              <span className={`status-pill status-pill--${cat.tone} chart-tooltip__pill`}>
+                                {cat.label}
+                              </span>
+                            )}
+                          </div>
+                        );
                       }}
-                      itemStyle={{ fontWeight: 700 }}
                     />
+
+                    {/* ── Systolic area ────────────────────────────────── */}
                     <Area
-                      type="monotone"
+                      type="monotoneX"
                       dataKey="avgSystolic"
                       stroke="#FF9B86"
-                      strokeWidth={3}
+                      strokeWidth={2.5}
                       fill="url(#sysGradient)"
-                      activeDot={{ r: 6, strokeWidth: 0, fill: "#FF9B86" }}
-                      dot={{ r: 4, fill: "#fff", stroke: "#FF9B86", strokeWidth: 2 }}
+                      dot={(props) => {
+                        const { cx, cy } = props;
+                        return (
+                          <circle
+                            key={`sys-dot-${cx}-${cy}`}
+                            cx={cx} cy={cy} r={4}
+                            fill="#fff"
+                            stroke="#FF9B86"
+                            strokeWidth={2.5}
+                          />
+                        );
+                      }}
+                      activeDot={(props) => {
+                        const { cx, cy } = props;
+                        return (
+                          <g key={`sys-active-${cx}`}>
+                            <circle cx={cx} cy={cy} r={10} fill="rgba(255,155,134,0.18)" />
+                            <circle cx={cx} cy={cy} r={6}  fill="#FF9B86" filter="url(#glow)" />
+                            <circle cx={cx} cy={cy} r={3}  fill="#fff" />
+                          </g>
+                        );
+                      }}
                     />
+
+                    {/* ── Diastolic area ───────────────────────────────── */}
                     <Area
-                      type="monotone"
+                      type="monotoneX"
                       dataKey="avgDiastolic"
                       stroke="#8B6471"
-                      strokeWidth={3}
+                      strokeWidth={2.5}
                       fill="url(#diaGradient)"
-                      activeDot={{ r: 6, strokeWidth: 0, fill: "#8B6471" }}
-                      dot={{ r: 4, fill: "#fff", stroke: "#8B6471", strokeWidth: 2 }}
+                      dot={(props) => {
+                        const { cx, cy } = props;
+                        return (
+                          <circle
+                            key={`dia-dot-${cx}-${cy}`}
+                            cx={cx} cy={cy} r={4}
+                            fill="#fff"
+                            stroke="#8B6471"
+                            strokeWidth={2.5}
+                          />
+                        );
+                      }}
+                      activeDot={(props) => {
+                        const { cx, cy } = props;
+                        return (
+                          <g key={`dia-active-${cx}`}>
+                            <circle cx={cx} cy={cy} r={10} fill="rgba(139,100,113,0.18)" />
+                            <circle cx={cx} cy={cy} r={6}  fill="#8B6471" filter="url(#glow)" />
+                            <circle cx={cx} cy={cy} r={3}  fill="#fff" />
+                          </g>
+                        );
+                      }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
