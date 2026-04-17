@@ -990,7 +990,7 @@ function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={summary.trends}
-                    margin={{ top: 12, right: 16, left: -18, bottom: 4 }}
+                    margin={{ top: 12, right: 16, left: 0, bottom: 4 }}
                   >
                     <defs>
                       {/* Systolic gradient — warm coral */}
@@ -1052,7 +1052,7 @@ function DashboardPage() {
                       tickLine={false}
                       axisLine={false}
                       tickMargin={10}
-                      width={44}
+                      width={52}
                       domain={["dataMin - 12", "dataMax + 12"]}
                       tick={{ fill: "#9A7480", fontSize: 11.5, fontWeight: 700, fontFamily: "Manrope, sans-serif" }}
                     />
