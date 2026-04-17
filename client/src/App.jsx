@@ -479,20 +479,155 @@ function DashboardPage() {
       const response = await api.get("/entries/all");
       const { entries } = response.data;
 
-      const doc = new jsPDF();
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 14;
+      const brandRose   = [181, 130, 140];   // #B5828C
+      const brandPeach  = [255, 180, 162];   // #FFB4A2
+      const brandDeep   = [96, 48, 60];      // deep rose text
+      const brandLight  = [254, 248, 248];   // near-white tint
+      const grayText    = [110, 90, 95];
 
+      // ── Helper: add footer to every page ────────────────────────────────
+      function addFooter(pageNum, totalPages) {
+        doc.setFontSize(8);
+        doc.setTextColor(...grayText);
+        doc.text(
+          `PulseGlass Health Report  •  Page ${pageNum} of ${totalPages}  •  Confidential`,
+          pageW / 2, pageH - 8, { align: "center" }
+        );
+        // thin footer rule
+        doc.setDrawColor(...brandPeach);
+        doc.setLineWidth(0.4);
+        doc.line(margin, pageH - 12, pageW - margin, pageH - 12);
+      }
+
+      // ── 1. Header band ───────────────────────────────────────────────────
+      doc.setFillColor(...brandRose);
+      doc.rect(0, 0, pageW, 36, "F");
+
+      // Accent stripe at top
+      doc.setFillColor(...brandPeach);
+      doc.rect(0, 0, pageW, 4, "F");
+
+      // Logo mark — heartbeat waveform icon drawn with lines
+      const lx = margin;
+      const ly = 18;
+      doc.setDrawColor(255, 247, 243);
+      doc.setLineWidth(2);
+      // simplified ECG waveform
+      const wave = [
+        [lx, ly], [lx + 5, ly], [lx + 8, ly - 6], [lx + 11, ly + 8],
+        [lx + 14, ly - 4], [lx + 17, ly], [lx + 22, ly],
+      ];
+      for (let i = 0; i < wave.length - 1; i++) {
+        doc.line(wave[i][0], wave[i][1], wave[i + 1][0], wave[i + 1][1]);
+      }
+
+      // App name
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(20);
-      doc.text("PulseGlass Summary", 14, 22);
+      doc.setTextColor(255, 247, 243);
+      doc.text("PulseGlass", lx + 27, ly + 2);
 
+      // Tagline
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(255, 220, 210);
+      doc.text("Personal Blood Pressure Health Report", lx + 27, ly + 8);
+
+      // Generated date — top right
+      const now = new Date();
+      doc.setFontSize(8);
+      doc.setTextColor(255, 240, 235);
+      doc.text(
+        `Generated: ${now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
+        pageW - margin, ly + 2, { align: "right" }
+      );
+
+      // ── 2. Patient info row ──────────────────────────────────────────────
+      let cursorY = 48;
+      doc.setFillColor(...brandLight);
+      doc.roundedRect(margin, cursorY, pageW - margin * 2, 18, 3, 3, "F");
+      doc.setDrawColor(...brandRose);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, cursorY, pageW - margin * 2, 18, 3, 3, "S");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...brandDeep);
+      doc.text("Patient", margin + 4, cursorY + 7);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...grayText);
+      doc.text(user?.name || "—", margin + 4, cursorY + 13);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...brandDeep);
+      doc.text("Total Entries", pageW / 2 - 20, cursorY + 7);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...grayText);
+      doc.text(String(entries.length), pageW / 2 - 20, cursorY + 13);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...brandDeep);
+      doc.text("Report Range", pageW - margin - 55, cursorY + 7);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...grayText);
+      if (entries.length) {
+        const oldest = formatDate(entries[entries.length - 1].recordedAt, { dateStyle: "short" });
+        const newest = formatDate(entries[0].recordedAt, { dateStyle: "short" });
+        doc.text(`${oldest} – ${newest}`, pageW - margin - 55, cursorY + 13);
+      } else {
+        doc.text("No entries", pageW - margin - 55, cursorY + 13);
+      }
+
+      cursorY += 26;
+
+      // ── 3. Summary stats boxes ───────────────────────────────────────────
+      if (summary?.totals) {
+        const t = summary.totals;
+        const boxes = [
+          { label: "Avg Blood Pressure", value: t.avgSystolic && t.avgDiastolic ? `${t.avgSystolic}/${t.avgDiastolic}` : "—", unit: "mmHg" },
+          { label: "Avg Pulse",          value: t.avgPulse ?? "—",             unit: "bpm" },
+          { label: "Medication Adherence", value: t.medicationAdherence != null ? `${t.medicationAdherence}%` : "—", unit: "" },
+          { label: "Check-ins (7 Days)", value: t.recentCheckIns ?? 0,         unit: "readings" },
+        ];
+
+        const bw = (pageW - margin * 2 - 9) / 4;
+        boxes.forEach((box, i) => {
+          const bx = margin + i * (bw + 3);
+          doc.setFillColor(255, 245, 243);
+          doc.roundedRect(bx, cursorY, bw, 22, 3, 3, "F");
+          doc.setDrawColor(...brandPeach);
+          doc.setLineWidth(0.3);
+          doc.roundedRect(bx, cursorY, bw, 22, 3, 3, "S");
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(...brandDeep);
+          doc.text(String(box.value), bx + bw / 2, cursorY + 10, { align: "center" });
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(7);
+          doc.setTextColor(...grayText);
+          doc.text(box.label, bx + bw / 2, cursorY + 16, { align: "center" });
+        });
+
+        cursorY += 30;
+      }
+
+      // ── 4. Readings table ────────────────────────────────────────────────
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
-      doc.setTextColor(100);
-      doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 30);
+      doc.setTextColor(...brandDeep);
+      doc.text("Reading History", margin, cursorY);
+      cursorY += 4;
 
       const dailyAverages = entries.reduce((acc, entry) => {
         const dateKey = new Date(entry.recordedAt).toLocaleDateString();
-        if (!acc[dateKey]) {
-          acc[dateKey] = { sysSum: 0, diaSum: 0, count: 0 };
-        }
+        if (!acc[dateKey]) acc[dateKey] = { sysSum: 0, diaSum: 0, count: 0 };
         acc[dateKey].sysSum += entry.systolic;
         acc[dateKey].diaSum += entry.diastolic;
         acc[dateKey].count += 1;
@@ -501,33 +636,114 @@ function DashboardPage() {
 
       const tableData = entries.map((entry) => {
         const dateKey = new Date(entry.recordedAt).toLocaleDateString();
-        const dailyAvg = dailyAverages[dateKey];
-        const avgDisplay = `${Math.round(dailyAvg.sysSum / dailyAvg.count)}/${Math.round(
-          dailyAvg.diaSum / dailyAvg.count
-        )}`;
-
+        const da = dailyAverages[dateKey];
+        const avgDisplay = `${Math.round(da.sysSum / da.count)}/${Math.round(da.diaSum / da.count)}`;
+        const cat = classifyReading(entry.systolic, entry.diastolic);
         return [
           formatDate(entry.recordedAt, { dateStyle: "short", timeStyle: "short" }),
           `${entry.systolic}/${entry.diastolic}`,
-          entry.pulse || "--",
+          entry.pulse || "—",
           entry.medicationTaken ? "Taken" : "Missed",
           avgDisplay,
+          cat.label,
         ];
       });
 
-      const tableHeaders = ["Date", "BP (mmHg)", "Pulse", "Meds", "Daily Avg (mmHg)"];
-
       autoTable(doc, {
-        startY: 38,
-        head: [tableHeaders],
+        startY: cursorY,
+        head: [["Date & Time", "BP (mmHg)", "Pulse", "Medication", "Daily Avg", "Classification"]],
         body: tableData,
-        headStyles: { fillColor: [181, 130, 140] },
-        alternateRowStyles: { fillColor: [250, 246, 246] },
-        margin: { top: 38 },
+        theme: "grid",
+        styles: {
+          fontSize: 9,
+          cellPadding: { top: 3, bottom: 3, left: 4, right: 4 },
+          textColor: [60, 40, 50],
+          lineColor: [230, 210, 215],
+          lineWidth: 0.25,
+        },
+        headStyles: {
+          fillColor: brandDeep,
+          textColor: [255, 247, 243],
+          fontStyle: "bold",
+          fontSize: 9,
+          halign: "center",
+        },
+        alternateRowStyles: { fillColor: [255, 249, 248] },
+        columnStyles: {
+          0: { cellWidth: 36 },
+          1: { halign: "center", fontStyle: "bold" },
+          2: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "center" },
+          5: {
+            halign: "center",
+            fontStyle: "italic",
+            textColor: brandRose,
+          },
+        },
+        margin: { left: margin, right: margin },
+        didParseCell(data) {
+          // colour-code the classification column
+          if (data.section === "body" && data.column.index === 5) {
+            const val = data.cell.raw;
+            if (val === "Hypertensive Crisis") {
+              data.cell.styles.textColor = [180, 40, 40];
+              data.cell.styles.fontStyle = "bold";
+            } else if (val === "High BP Stage 2" || val === "High BP Stage 1") {
+              data.cell.styles.textColor = [190, 80, 40];
+            } else if (val === "Elevated") {
+              data.cell.styles.textColor = [160, 120, 40];
+            } else {
+              data.cell.styles.textColor = [40, 120, 70];
+            }
+          }
+          // colour-code medication column
+          if (data.section === "body" && data.column.index === 3) {
+            data.cell.styles.textColor =
+              data.cell.raw === "Taken" ? [40, 120, 70] : [180, 60, 60];
+          }
+        },
       });
 
-      doc.save("blood-pressure-export.pdf");
-      setFeedback("PDF exported successfully.");
+      // ── 5. BP Classification legend ──────────────────────────────────────
+      const legendY = doc.lastAutoTable.finalY + 10;
+      const legendItems = [
+        { label: "Normal", color: [40, 120, 70] },
+        { label: "Elevated", color: [160, 120, 40] },
+        { label: "High BP Stage 1", color: [190, 80, 40] },
+        { label: "High BP Stage 2", color: [190, 80, 40] },
+        { label: "Hypertensive Crisis", color: [180, 40, 40] },
+      ];
+
+      // Only draw legend if it fits on the current page
+      if (legendY + 20 < pageH - 20) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(...grayText);
+        doc.text("BP Classification Reference:", margin, legendY);
+
+        let lx2 = margin;
+        legendItems.forEach((item) => {
+          doc.setFillColor(...item.color);
+          doc.circle(lx2 + 2, legendY + 6, 2, "F");
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(7.5);
+          doc.setTextColor(...item.color);
+          doc.text(item.label, lx2 + 6, legendY + 7.5);
+          lx2 += doc.getTextWidth(item.label) + 14;
+        });
+      }
+
+      // ── 6. Add footer to all pages ───────────────────────────────────────
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        addFooter(p, totalPages);
+      }
+
+      const fileName = `pulseglass-report-${now.toISOString().slice(0, 10)}.pdf`;
+      doc.save(fileName);
+      setFeedback("PDF report exported successfully.");
     } catch (requestError) {
       console.error(requestError);
       setError(`Export Error: ${requestError.message || requestError}`);
