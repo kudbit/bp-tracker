@@ -354,15 +354,10 @@ textarea {
   transition: transform 250ms ease, box-shadow 250ms ease, opacity 350ms ease, filter 350ms ease, background 350ms ease;
 }
 
-.auth-form .primary-button.primary-button--ready {
+.auth-form .primary-button.primary-button--ready,
+.reading-form .primary-button.primary-button--ready {
   background: linear-gradient(135deg, var(--rose-300), var(--mauve-500));
   box-shadow: 0 20px 36px rgba(181, 130, 140, 0.4);
-  filter: grayscale(0%) opacity(1);
-}
-
-.reading-form .primary-button.primary-button--dark {
-  background: linear-gradient(135deg, var(--ink-700), var(--ink-900));
-  box-shadow: 0 18px 30px rgba(55, 41, 47, 0.35);
   filter: grayscale(0%) opacity(1);
 }
 

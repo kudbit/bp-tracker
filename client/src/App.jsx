@@ -737,7 +737,7 @@ function DashboardPage() {
 
               <button
                 className={`primary-button ${
-                  form.recordedAt && form.systolic && form.diastolic ? "primary-button--dark" : ""
+                  form.recordedAt && form.systolic && form.diastolic ? "primary-button--ready" : ""
                 }`}
                 disabled={isSubmitting}
                 type="submit"
