@@ -533,8 +533,8 @@ function DashboardPage() {
       }
 
       // App name
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(20);
+      doc.setFont("times", "bold");
+      doc.setFontSize(22);
       doc.setTextColor(255, 247, 243);
       doc.text("PulseGlass", lx + 27, ly + 2);
 
@@ -693,13 +693,13 @@ function DashboardPage() {
           // colour-code the classification column
           if (data.section === "body" && data.column.index === 5) {
             const val = data.cell.raw;
-            if (val === "Hypertensive Crisis") {
-              data.cell.styles.textColor = [180, 40, 40];
-              data.cell.styles.fontStyle = "bold";
-            } else if (val === "High BP Stage 2" || val === "High BP Stage 1") {
+            if (val === "Stage 2" || val === "Hypertensive Crisis") {
               data.cell.styles.textColor = [190, 80, 40];
+              data.cell.styles.fontStyle = "bold";
+            } else if (val === "Stage 1") {
+              data.cell.styles.textColor = [190, 110, 50];
             } else if (val === "Elevated") {
-              data.cell.styles.textColor = [160, 120, 40];
+              data.cell.styles.textColor = [160, 120, 60];
             } else {
               data.cell.styles.textColor = [40, 120, 70];
             }
@@ -715,11 +715,10 @@ function DashboardPage() {
       // ── 5. BP Classification legend ──────────────────────────────────────
       const legendY = doc.lastAutoTable.finalY + 10;
       const legendItems = [
-        { label: "Normal", color: [40, 120, 70] },
-        { label: "Elevated", color: [160, 120, 40] },
-        { label: "High BP Stage 1", color: [190, 80, 40] },
-        { label: "High BP Stage 2", color: [190, 80, 40] },
-        { label: "Hypertensive Crisis", color: [180, 40, 40] },
+        { label: "Optimal", color: [40, 120, 70] },
+        { label: "Elevated", color: [160, 120, 60] },
+        { label: "Stage 1", color: [190, 110, 50] },
+        { label: "Stage 2", color: [190, 80, 40] },
       ];
 
       // Only draw legend if it fits on the current page
