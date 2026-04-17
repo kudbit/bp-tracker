@@ -572,10 +572,6 @@ textarea {
   grid-template-columns: 0.95fr 1.05fr;
 }
 
-.content-grid--secondary {
-  grid-template-columns: 0.9fr 1.1fr;
-}
-
 .section-heading {
   position: relative;
   z-index: 1;
