@@ -758,27 +758,41 @@ function DashboardPage() {
             <div className="chart-wrap">
               {summary?.trends?.length ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={summary.trends}>
+                  <AreaChart data={summary.trends} margin={{ top: 10, right: 10, left: -24, bottom: 0 }}>
                     <defs>
                       <linearGradient id="sysGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#FFB4A2" stopOpacity={0.8} />
-                        <stop offset="100%" stopColor="#FFB4A2" stopOpacity={0.05} />
+                        <stop offset="0%" stopColor="#FFB4A2" stopOpacity={0.35} />
+                        <stop offset="100%" stopColor="#FFB4A2" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="diaGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#B5828C" stopOpacity={0.6} />
-                        <stop offset="100%" stopColor="#B5828C" stopOpacity={0.02} />
+                        <stop offset="0%" stopColor="#B5828C" stopOpacity={0.25} />
+                        <stop offset="100%" stopColor="#B5828C" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid stroke="rgba(94, 78, 82, 0.12)" vertical={false} />
-                    <XAxis dataKey="label" tickLine={false} axisLine={false} />
-                    <YAxis tickLine={false} axisLine={false} domain={["dataMin - 10", "dataMax + 10"]} />
+                    <CartesianGrid stroke="rgba(181, 130, 140, 0.18)" strokeDasharray="4 4" vertical={false} />
+                    <XAxis 
+                      dataKey="label" 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tickMargin={14}
+                      tick={{ fill: "#8B6471", fontSize: 12, fontWeight: 600 }}
+                    />
+                    <YAxis 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tickMargin={12}
+                      domain={["dataMin - 10", "dataMax + 10"]} 
+                      tick={{ fill: "#8B6471", fontSize: 12, fontWeight: 600 }}
+                    />
                     <Tooltip
                       contentStyle={{
-                        borderRadius: 18,
-                        border: "1px solid rgba(255,255,255,0.55)",
+                        borderRadius: 16,
+                        border: "1px solid rgba(255,255,255,0.7)",
                         background: "rgba(255,255,255,0.92)",
-                        boxShadow: "0 20px 40px rgba(80, 52, 62, 0.16)",
+                        boxShadow: "0 16px 32px rgba(96, 64, 72, 0.12)",
+                        padding: "12px 18px",
                       }}
+                      itemStyle={{ fontWeight: 700 }}
                     />
                     <Area
                       type="monotone"
@@ -786,6 +800,8 @@ function DashboardPage() {
                       stroke="#FF9B86"
                       strokeWidth={3}
                       fill="url(#sysGradient)"
+                      activeDot={{ r: 6, strokeWidth: 0, fill: "#FF9B86" }}
+                      dot={{ r: 4, fill: "#fff", stroke: "#FF9B86", strokeWidth: 2 }}
                     />
                     <Area
                       type="monotone"
@@ -793,6 +809,8 @@ function DashboardPage() {
                       stroke="#8B6471"
                       strokeWidth={3}
                       fill="url(#diaGradient)"
+                      activeDot={{ r: 6, strokeWidth: 0, fill: "#8B6471" }}
+                      dot={{ r: 4, fill: "#fff", stroke: "#8B6471", strokeWidth: 2 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
