@@ -1,0 +1,17 @@
+{
+  "name": "PulseGlass Tracker",
+  "short_name": "PulseGlass",
+  "description": "A modern blood pressure tracker with medication, pulse, and wellness insights.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9f6",
+  "theme_color": "#ffb4a2",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512 any",
+      "purpose": "any maskable"
+    }
+  ]
+}
