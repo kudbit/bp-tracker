@@ -61,7 +61,10 @@ function classifyReading(systolic, diastolic) {
     return { label: "Elevated", tone: "elevated" };
   }
 
-  if (systolic < 140 || diastolic < 90) {
+  // Stage 1: sys 130–139 OR dia 80–89
+  // After ruling out Normal (<120/<80) and Elevated (120-129/<80),
+  // this catches sys 130-139 OR dia 80-89 (both must stay below Stage 2 thresholds)
+  if (systolic < 140 && diastolic < 90) {
     return { label: "Stage 1", tone: "watch" };
   }
 
