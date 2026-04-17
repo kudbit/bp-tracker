@@ -53,21 +53,23 @@ function classifyReading(systolic, diastolic) {
     return { label: "No reading", tone: "muted" };
   }
 
-  if (systolic < 120 && diastolic < 80) {
+  // Each boundary has a 3 mmHg tolerance buffer
+  // Optimal:  sys ≤ 123  AND  dia ≤ 83   (standard 120/80 + buffer)
+  if (systolic <= 123 && diastolic <= 83) {
     return { label: "Optimal", tone: "optimal" };
   }
 
-  if (systolic < 130 && diastolic < 80) {
+  // Elevated: sys ≤ 132  AND  dia ≤ 83   (standard 129/80 + buffer)
+  if (systolic <= 132 && diastolic <= 83) {
     return { label: "Elevated", tone: "elevated" };
   }
 
-  // Stage 1: sys 130–139 OR dia 80–89
-  // After ruling out Normal (<120/<80) and Elevated (120-129/<80),
-  // this catches sys 130-139 OR dia 80-89 (both must stay below Stage 2 thresholds)
-  if (systolic < 140 && diastolic < 90) {
+  // Stage 1:  sys ≤ 142  AND  dia ≤ 92   (standard 139/89 + buffer)
+  if (systolic <= 142 && diastolic <= 92) {
     return { label: "Stage 1", tone: "watch" };
   }
 
+  // Stage 2:  sys > 142  OR   dia > 92
   return { label: "Stage 2", tone: "alert" };
 }
 
