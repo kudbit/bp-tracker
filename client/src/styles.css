@@ -59,6 +59,12 @@ textarea {
   padding-bottom: 64px;
 }
 
+.app-stage--auth {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .floating-orb {
   position: absolute;
   border-radius: 999px;
@@ -147,7 +153,7 @@ textarea {
 
 .auth-showcase,
 .auth-card {
-  padding: 34px;
+  padding: 28px;
 }
 
 .auth-showcase {
@@ -181,15 +187,15 @@ textarea {
 .showcase-features {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 20px 24px;
-  border-radius: 24px;
+  padding: 14px 20px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.44);
   border: 1px solid rgba(255, 255, 255, 0.52);
   transition: transform 250ms ease, background 250ms ease;
@@ -278,8 +284,8 @@ textarea {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 16px;
-  margin-top: 24px;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .field {

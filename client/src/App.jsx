@@ -255,7 +255,7 @@ function AuthPage({ mode }) {
   }
 
   return (
-    <div className="app-stage">
+    <div className="app-stage app-stage--auth">
       <div className="floating-orb floating-orb--left" />
       <div className="floating-orb floating-orb--right" />
 
