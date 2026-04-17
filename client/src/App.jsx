@@ -558,10 +558,6 @@ function DashboardPage() {
           <div>
             <span className="eyebrow">Personal dashboard</span>
             <h1>Hi {user?.name?.split(" ")[0]}, hope you are doing great.</h1>
-            <p className="topbar-copy">
-              A secure wellness dashboard for tracking blood pressure, medication, pulse, and the
-              patterns around how you feel.
-            </p>
           </div>
 
           <div className="topbar-actions desktop-only">
