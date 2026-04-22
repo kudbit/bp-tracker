@@ -1,5 +1,6 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { AnimatePresence, motion, useDragControls } from "framer-motion";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import {
   Area,
@@ -402,6 +403,10 @@ function DashboardPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
+  const [showHistorySheet, setShowHistorySheet] = useState(false);
+  const [sheetFilter, setSheetFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     if (error || feedback) {
@@ -420,7 +425,7 @@ function DashboardPage() {
     try {
       const [summaryResponse, entriesResponse] = await Promise.all([
         api.get("/entries/summary"),
-        api.get("/entries?limit=16"),
+        api.get("/entries?limit=500"),
       ]);
 
       setSummary(summaryResponse.data);
@@ -1219,6 +1224,16 @@ function DashboardPage() {
                 <span className="eyebrow">History</span>
                 <h3>Recent readings</h3>
               </div>
+              {entries.length > 3 && (
+                <button
+                  className="show-more-btn"
+                  onClick={() => setShowHistorySheet(true)}
+                  type="button"
+                >
+                  Show all
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+              )}
             </div>
 
             {isLoading ? (
@@ -1227,7 +1242,7 @@ function DashboardPage() {
               </div>
             ) : entries.length ? (
               <div className="history-list">
-                {entries.map((entry) => {
+                {entries.slice(0, 3).map((entry) => {
                   const category = classifyReading(entry.systolic, entry.diastolic);
 
                   return (
@@ -1266,6 +1281,16 @@ function DashboardPage() {
                     </article>
                   );
                 })}
+                {entries.length > 3 && (
+                  <button
+                    className="show-more-row-btn"
+                    onClick={() => setShowHistorySheet(true)}
+                    type="button"
+                  >
+                    View all {entries.length} readings
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                  </button>
+                )}
               </div>
             ) : (
               <div className="empty-state">
@@ -1296,7 +1321,186 @@ function DashboardPage() {
           )}
         </button>
       </main>
+
+      <AnimatePresence>
+        {showHistorySheet && (
+          <HistoryBottomSheet
+            entries={entries}
+            sheetFilter={sheetFilter}
+            setSheetFilter={setSheetFilter}
+            dateFrom={dateFrom}
+            setDateFrom={setDateFrom}
+            dateTo={dateTo}
+            setDateTo={setDateTo}
+            onClose={() => setShowHistorySheet(false)}
+            onDelete={handleDeleteEntry}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, setDateFrom, dateTo, setDateTo, onClose, onDelete }) {
+  const dragControls = useDragControls();
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  function handleDragEnd(_, info) {
+    if (info.offset.y > 120 || info.velocity.y > 800) onClose();
+  }
+
+  const now = new Date();
+  const filtered = entries.filter((entry) => {
+    const d = new Date(entry.recordedAt);
+    if (sheetFilter === "week") {
+      const cutoff = new Date(now); cutoff.setDate(now.getDate() - 7); return d >= cutoff;
+    }
+    if (sheetFilter === "2weeks") {
+      const cutoff = new Date(now); cutoff.setDate(now.getDate() - 14); return d >= cutoff;
+    }
+    if (sheetFilter === "month") {
+      const cutoff = new Date(now); cutoff.setDate(now.getDate() - 30); return d >= cutoff;
+    }
+    if (sheetFilter === "range") {
+      const from = dateFrom ? new Date(dateFrom) : null;
+      const to = dateTo ? new Date(dateTo + "T23:59:59") : null;
+      if (from && d < from) return false;
+      if (to && d > to) return false;
+      return true;
+    }
+    return true;
+  });
+
+  const FILTERS = [
+    { id: "all", label: "All" },
+    { id: "week", label: "Last week" },
+    { id: "2weeks", label: "2 weeks" },
+    { id: "month", label: "Last month" },
+    { id: "range", label: "Date range" },
+  ];
+
+  return (
+    <>
+      <motion.div
+        className="sheet-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        onClick={onClose}
+        aria-label="Close history"
+      />
+
+      <motion.div
+        className="history-sheet"
+        initial={{ y: "105%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "105%" }}
+        transition={{ type: "spring", damping: 34, stiffness: 320, mass: 0.86 }}
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragMomentum={false}
+        dragElastic={0.12}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        onDragEnd={handleDragEnd}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="sheet-handle-bar">
+          <div className="sheet-handle" onPointerDown={(e) => dragControls.start(e)} />
+        </div>
+
+        <div className="sheet-header">
+          <div>
+            <span className="eyebrow">Full history</span>
+            <h2 className="sheet-title">All readings</h2>
+          </div>
+          <button className="sheet-close-btn" onClick={onClose} type="button" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+
+        <div className="sheet-filters">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              className={`sheet-filter-tab${sheetFilter === f.id ? " sheet-filter-tab--active" : ""}`}
+              onClick={() => setSheetFilter(f.id)}
+              type="button"
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {sheetFilter === "range" && (
+          <div className="sheet-date-range">
+            <div className="field">
+              <span>From</span>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+            </div>
+            <div className="field">
+              <span>To</span>
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+            </div>
+          </div>
+        )}
+
+        <p className="sheet-count">{filtered.length} reading{filtered.length !== 1 ? "s" : ""}</p>
+
+        <div className="sheet-list">
+          {filtered.length === 0 ? (
+            <div className="empty-state">
+              <strong>No readings in this period.</strong>
+              <p>Try a different filter or add your first reading.</p>
+            </div>
+          ) : (
+            filtered.map((entry) => {
+              const category = classifyReading(entry.systolic, entry.diastolic);
+              return (
+                <article className="history-item" key={entry._id}>
+                  <div className="history-main">
+                    <div className="history-topline">
+                      <strong>{entry.systolic}/{entry.diastolic} mmHg</strong>
+                      <span className={`status-pill status-pill--${category.tone}`}>
+                        {category.label}
+                      </span>
+                    </div>
+                    <p className="history-meta">{formatDate(entry.recordedAt)}</p>
+                    <div className="history-chips">
+                      <span className="chip">Pulse {entry.pulse ?? "--"}</span>
+                      <span className="chip">Medication {entry.medicationTaken ? "taken" : "missed"}</span>
+                    </div>
+                    {entry.symptoms?.length ? (
+                      <p className="history-notes">Symptoms: {entry.symptoms.join(", ")}</p>
+                    ) : null}
+                    {entry.notes ? <p className="history-notes">{entry.notes}</p> : null}
+                  </div>
+                  <button
+                    className="ghost-button ghost-button--danger"
+                    onClick={() => onDelete(entry._id)}
+                    type="button"
+                  >
+                    Remove
+                  </button>
+                </article>
+              );
+            })
+          )}
+        </div>
+      </motion.div>
+    </>
   );
 }
 
