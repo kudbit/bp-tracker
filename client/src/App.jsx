@@ -1247,37 +1247,45 @@ function DashboardPage() {
 
                   return (
                     <article className="history-item" key={entry._id}>
-                      <div className="history-main">
-                        <div className="history-topline">
-                          <strong>{entry.systolic}/{entry.diastolic} mmHg</strong>
-                          <span className={`status-pill status-pill--${category.tone}`}>
-                            {category.label}
-                          </span>
+                      <div className="history-item-top">
+                        <div>
+                          <div className="history-topline">
+                            <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
+                            <span className={`status-pill status-pill--${category.tone}`}>
+                              {category.label}
+                            </span>
+                          </div>
+                          <p className="history-bp-unit">mmHg</p>
                         </div>
-
-                        <p className="history-meta">{formatDate(entry.recordedAt)}</p>
-
-                        <div className="history-chips">
-                          <span className="chip">Pulse {entry.pulse ?? "--"}</span>
-                          <span className="chip">
-                            Medication {entry.medicationTaken ? "taken" : "missed"}
-                          </span>
-                        </div>
-
-                        {entry.symptoms?.length ? (
-                          <p className="history-notes">Symptoms: {entry.symptoms.join(", ")}</p>
-                        ) : null}
-
-                        {entry.notes ? <p className="history-notes">{entry.notes}</p> : null}
+                        <button
+                          className="ghost-button ghost-button--danger"
+                          onClick={() => handleDeleteEntry(entry._id)}
+                          type="button"
+                        >
+                          Remove
+                        </button>
                       </div>
 
-                      <button
-                        className="ghost-button ghost-button--danger"
-                        onClick={() => handleDeleteEntry(entry._id)}
-                        type="button"
-                      >
-                        Remove
-                      </button>
+                      <div className="history-meta-grid">
+                        <div className="history-meta-box">
+                          <span className="history-meta-label">Date</span>
+                          <span className="history-meta-value">{formatDate(entry.recordedAt, { dateStyle: "short" })}</span>
+                        </div>
+                        <div className="history-meta-box">
+                          <span className="history-meta-label">Pulse</span>
+                          <span className="history-meta-value">{entry.pulse ?? "—"} bpm</span>
+                        </div>
+                        <div className="history-meta-box">
+                          <span className="history-meta-label">Medication</span>
+                          <span className="history-meta-value">{entry.medicationTaken ? "Taken" : "Missed"}</span>
+                        </div>
+                      </div>
+
+                      {(entry.symptoms?.length || entry.notes) ? (
+                        <p className="history-notes">
+                          {entry.symptoms?.length ? `Symptoms: ${entry.symptoms.join(", ")}` : entry.notes}
+                        </p>
+                      ) : null}
                     </article>
                   );
                 })}
@@ -1470,30 +1478,45 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
               const category = classifyReading(entry.systolic, entry.diastolic);
               return (
                 <article className="history-item" key={entry._id}>
-                  <div className="history-main">
-                    <div className="history-topline">
-                      <strong>{entry.systolic}/{entry.diastolic} mmHg</strong>
-                      <span className={`status-pill status-pill--${category.tone}`}>
-                        {category.label}
-                      </span>
+                  <div className="history-item-top">
+                    <div>
+                      <div className="history-topline">
+                        <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
+                        <span className={`status-pill status-pill--${category.tone}`}>
+                          {category.label}
+                        </span>
+                      </div>
+                      <p className="history-bp-unit">mmHg</p>
                     </div>
-                    <p className="history-meta">{formatDate(entry.recordedAt)}</p>
-                    <div className="history-chips">
-                      <span className="chip">Pulse {entry.pulse ?? "--"}</span>
-                      <span className="chip">Medication {entry.medicationTaken ? "taken" : "missed"}</span>
-                    </div>
-                    {entry.symptoms?.length ? (
-                      <p className="history-notes">Symptoms: {entry.symptoms.join(", ")}</p>
-                    ) : null}
-                    {entry.notes ? <p className="history-notes">{entry.notes}</p> : null}
+                    <button
+                      className="ghost-button ghost-button--danger"
+                      onClick={() => onDelete(entry._id)}
+                      type="button"
+                    >
+                      Remove
+                    </button>
                   </div>
-                  <button
-                    className="ghost-button ghost-button--danger"
-                    onClick={() => onDelete(entry._id)}
-                    type="button"
-                  >
-                    Remove
-                  </button>
+
+                  <div className="history-meta-grid">
+                    <div className="history-meta-box">
+                      <span className="history-meta-label">Date</span>
+                      <span className="history-meta-value">{formatDate(entry.recordedAt, { dateStyle: "short" })}</span>
+                    </div>
+                    <div className="history-meta-box">
+                      <span className="history-meta-label">Pulse</span>
+                      <span className="history-meta-value">{entry.pulse ?? "—"} bpm</span>
+                    </div>
+                    <div className="history-meta-box">
+                      <span className="history-meta-label">Medication</span>
+                      <span className="history-meta-value">{entry.medicationTaken ? "Taken" : "Missed"}</span>
+                    </div>
+                  </div>
+
+                  {(entry.symptoms?.length || entry.notes) ? (
+                    <p className="history-notes">
+                      {entry.symptoms?.length ? `Symptoms: ${entry.symptoms.join(", ")}` : entry.notes}
+                    </p>
+                  ) : null}
                 </article>
               );
             })

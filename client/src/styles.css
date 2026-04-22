@@ -830,9 +830,42 @@ textarea {
 
 .history-item {
   display: flex;
-  align-items: start;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 16px rgba(96, 64, 72, 0.06);
+  transition: background 200ms ease;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.history-item-top {
+  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+}
+
+.history-bp {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  line-height: 1;
+}
+
+.history-bp-unit {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-700);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
 }
 
 .history-topline {
@@ -842,31 +875,51 @@ textarea {
   flex-wrap: wrap;
 }
 
-.history-topline strong {
-  font-size: 1.2rem;
+.history-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.history-chips {
+.history-meta-box {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 248, 245, 0.7);
+  border: 1px solid rgba(181, 130, 140, 0.12);
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 12px 0;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
+.history-meta-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-700);
-  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.history-meta-value {
+  font-size: 0.92rem;
   font-weight: 700;
+  color: var(--ink-900);
+}
+
+.history-item-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .history-notes {
-  margin: 8px 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-700);
+  line-height: 1.55;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 248, 245, 0.6);
+  border: 1px solid rgba(181, 130, 140, 0.1);
 }
 
 .export-fab {
@@ -1117,8 +1170,9 @@ textarea {
 }
 
 .sheet-filter-tab:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(181, 130, 140, 0.1);
   border-color: rgba(181, 130, 140, 0.45);
+  color: var(--mauve-500);
 }
 
 .sheet-filter-tab--active {
