@@ -17,6 +17,32 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(181, 130, 140, 0.28) transparent;
+}
+
+/* Webkit custom scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(181, 130, 140, 0.28);
+  border-radius: 999px;
+  transition: background 200ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(181, 130, 140, 0.52);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 html,
