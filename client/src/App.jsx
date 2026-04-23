@@ -1240,7 +1240,7 @@ function DashboardPage() {
                       <div className="history-item-top">
                         <div>
                           <div className="history-bp-row">
-                            <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
+                            <span className="history-bp">{entry.systolic}/{entry.diastolic}</span>
                             <span className="history-bp-unit">mmHg</span>
                           </div>
                           <span className={`status-pill status-pill--${category.tone}`}>
@@ -1473,7 +1473,7 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
                   <div className="history-item-top">
                     <div>
                       <div className="history-bp-row">
-                        <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
+                        <span className="history-bp">{entry.systolic}/{entry.diastolic}</span>
                         <span className="history-bp-unit">mmHg</span>
                       </div>
                       <span className={`status-pill status-pill--${category.tone}`}>
