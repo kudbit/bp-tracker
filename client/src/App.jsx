@@ -79,7 +79,7 @@ function formatDate(dateValue, options = { dateStyle: "medium", timeStyle: "shor
     return "--";
   }
 
-  return new Intl.DateTimeFormat("en-US", options).format(new Date(dateValue));
+  return new Intl.DateTimeFormat("en-GB", options).format(new Date(dateValue));
 }
 
 function toNumberOrUndefined(value) {
@@ -393,6 +393,57 @@ function AuthPage({ mode }) {
   );
 }
 
+function HistoryItem({ entry, onDelete }) {
+  const category = classifyReading(entry.systolic, entry.diastolic);
+
+  return (
+    <article className="history-item">
+      <div className="history-item-main">
+        <div className="history-bp-wrapper">
+          <div className="history-bp-row">
+            <span className="history-bp">{entry.systolic}/{entry.diastolic}</span>
+            <span className="history-bp-unit">mmHg</span>
+          </div>
+          <span className={`status-pill status-pill--${category.tone}`}>
+            {category.label}
+          </span>
+        </div>
+        <button
+          className="history-delete-btn"
+          onClick={() => onDelete(entry._id)}
+          type="button"
+          title="Remove reading"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        </button>
+      </div>
+
+      <div className="history-meta-row">
+        <div className="history-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>{formatDate(entry.recordedAt, { dateStyle: "short" })}</span>
+        </div>
+        <span className="history-meta-separator" />
+        <div className="history-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>{entry.pulse ?? "—"} bpm</span>
+        </div>
+        <span className="history-meta-separator" />
+        <div className="history-meta-item" style={{ color: entry.medicationTaken ? "var(--success)" : "var(--danger)" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+          <span>{entry.medicationTaken ? "Taken" : "Missed"}</span>
+        </div>
+      </div>
+
+      {(entry.symptoms?.length || entry.notes) ? (
+        <p className="history-notes">
+          {entry.symptoms?.length ? `Symptoms: ${entry.symptoms.join(", ")}` : entry.notes}
+        </p>
+      ) : null}
+    </article>
+  );
+}
+
 function DashboardPage() {
   const { user, logout } = useAuth();
   const [summary, setSummary] = useState(null);
@@ -554,7 +605,7 @@ function DashboardPage() {
       doc.setFontSize(8);
       doc.setTextColor(255, 240, 235);
       doc.text(
-        `Generated: ${now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
+        `Generated: ${now.toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}`,
         pageW - margin, ly + 2, { align: "right" }
       );
 
@@ -597,39 +648,6 @@ function DashboardPage() {
 
       cursorY += 26;
 
-      // ── 3. Summary stats boxes ───────────────────────────────────────────
-      if (summary?.totals) {
-        const t = summary.totals;
-        const boxes = [
-          { label: "Avg Blood Pressure", value: t.avgSystolic && t.avgDiastolic ? `${t.avgSystolic}/${t.avgDiastolic}` : "—", unit: "mmHg" },
-          { label: "Avg Pulse",          value: t.avgPulse ?? "—",             unit: "bpm" },
-          { label: "Medication Adherence", value: t.medicationAdherence != null ? `${t.medicationAdherence}%` : "—", unit: "" },
-          { label: "Check-ins (7 Days)", value: t.recentCheckIns ?? 0,         unit: "readings" },
-        ];
-
-        const bw = (pageW - margin * 2 - 9) / 4;
-        boxes.forEach((box, i) => {
-          const bx = margin + i * (bw + 3);
-          doc.setFillColor(255, 245, 243);
-          doc.roundedRect(bx, cursorY, bw, 22, 3, 3, "F");
-          doc.setDrawColor(...brandPeach);
-          doc.setLineWidth(0.3);
-          doc.roundedRect(bx, cursorY, bw, 22, 3, 3, "S");
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(13);
-          doc.setTextColor(...brandDeep);
-          doc.text(String(box.value), bx + bw / 2, cursorY + 10, { align: "center" });
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(7);
-          doc.setTextColor(...grayText);
-          doc.text(box.label, bx + bw / 2, cursorY + 16, { align: "center" });
-        });
-
-        cursorY += 30;
-      }
-
       // ── 4. Readings table ────────────────────────────────────────────────
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
@@ -638,7 +656,7 @@ function DashboardPage() {
       cursorY += 4;
 
       const dailyAverages = entries.reduce((acc, entry) => {
-        const dateKey = new Date(entry.recordedAt).toLocaleDateString();
+        const dateKey = new Date(entry.recordedAt).toLocaleDateString("en-GB");
         if (!acc[dateKey]) acc[dateKey] = { sysSum: 0, diaSum: 0, count: 0 };
         acc[dateKey].sysSum += entry.systolic;
         acc[dateKey].diaSum += entry.diastolic;
@@ -646,19 +664,32 @@ function DashboardPage() {
         return acc;
       }, {});
 
+      let currentSpanDate = null;
       const tableData = entries.map((entry) => {
-        const dateKey = new Date(entry.recordedAt).toLocaleDateString();
+        const dateKey = new Date(entry.recordedAt).toLocaleDateString("en-GB");
         const da = dailyAverages[dateKey];
         const avgDisplay = `${Math.round(da.sysSum / da.count)}/${Math.round(da.diaSum / da.count)}`;
         const cat = classifyReading(entry.systolic, entry.diastolic);
-        return [
+        
+        const row = [
           formatDate(entry.recordedAt, { dateStyle: "short", timeStyle: "short" }),
           `${entry.systolic}/${entry.diastolic}`,
           entry.pulse || "—",
           entry.medicationTaken ? "Taken" : "Missed",
-          avgDisplay,
-          cat.label,
         ];
+
+        if (currentSpanDate !== dateKey) {
+          currentSpanDate = dateKey;
+          row.push({ 
+            content: avgDisplay, 
+            rowSpan: da.count, 
+            styles: { valign: 'middle', halign: 'center', fontStyle: 'bold', fillColor: [253, 248, 248], textColor: [96, 48, 60] } 
+          });
+        }
+        
+        row.push(cat.label);
+        
+        return row;
       });
 
       autoTable(doc, {
@@ -667,20 +698,23 @@ function DashboardPage() {
         body: tableData,
         theme: "grid",
         styles: {
+          font: "helvetica",
           fontSize: 9,
-          cellPadding: { top: 3, bottom: 3, left: 4, right: 4 },
-          textColor: [60, 40, 50],
-          lineColor: [230, 210, 215],
-          lineWidth: 0.25,
+          cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+          textColor: [45, 30, 38],
+          lineColor: [210, 190, 195],
+          lineWidth: 0.1,
         },
         headStyles: {
-          fillColor: brandDeep,
-          textColor: [255, 247, 243],
+          fillColor: [248, 242, 243],
+          textColor: [80, 50, 60],
           fontStyle: "bold",
           fontSize: 9,
           halign: "center",
+          lineColor: [210, 190, 195],
+          lineWidth: 0.2,
         },
-        alternateRowStyles: { fillColor: [255, 249, 248] },
+        alternateRowStyles: { fillColor: [253, 250, 250] },
         columnStyles: {
           0: { cellWidth: 36 },
           1: { halign: "center", fontStyle: "bold" },
@@ -690,12 +724,10 @@ function DashboardPage() {
           5: {
             halign: "center",
             fontStyle: "italic",
-            textColor: brandRose,
           },
         },
         margin: { left: margin, right: margin },
         didParseCell(data) {
-          // colour-code the classification column
           if (data.section === "body" && data.column.index === 5) {
             const val = data.cell.raw;
             if (val === "Stage 2" || val === "Hypertensive Crisis") {
@@ -709,7 +741,6 @@ function DashboardPage() {
               data.cell.styles.textColor = [40, 120, 70];
             }
           }
-          // colour-code medication column
           if (data.section === "body" && data.column.index === 3) {
             data.cell.styles.textColor =
               data.cell.raw === "Taken" ? [40, 120, 70] : [180, 60, 60];
@@ -1232,53 +1263,9 @@ function DashboardPage() {
               </div>
             ) : entries.length ? (
               <div className="history-list">
-                {entries.slice(0, 3).map((entry) => {
-                  const category = classifyReading(entry.systolic, entry.diastolic);
-
-                  return (
-                    <article className="history-item" key={entry._id}>
-                      <div className="history-item-top">
-                        <div>
-                          <div className="history-bp-row">
-                            <span className="history-bp">{entry.systolic}/{entry.diastolic}</span>
-                            <span className="history-bp-unit">mmHg</span>
-                          </div>
-                          <span className={`status-pill status-pill--${category.tone}`}>
-                            {category.label}
-                          </span>
-                        </div>
-                        <button
-                          className="ghost-button ghost-button--danger"
-                          onClick={() => handleDeleteEntry(entry._id)}
-                          type="button"
-                        >
-                          Remove
-                        </button>
-                      </div>
-
-                      <div className="history-meta-grid">
-                        <div className="history-meta-box">
-                          <span className="history-meta-label">Date</span>
-                          <span className="history-meta-value">{formatDate(entry.recordedAt, { dateStyle: "short" })}</span>
-                        </div>
-                        <div className="history-meta-box">
-                          <span className="history-meta-label">Pulse</span>
-                          <span className="history-meta-value">{entry.pulse ?? "—"} bpm</span>
-                        </div>
-                        <div className="history-meta-box">
-                          <span className="history-meta-label">Medication</span>
-                          <span className="history-meta-value">{entry.medicationTaken ? "Taken" : "Missed"}</span>
-                        </div>
-                      </div>
-
-                      {(entry.symptoms?.length || entry.notes) ? (
-                        <p className="history-notes">
-                          {entry.symptoms?.length ? `Symptoms: ${entry.symptoms.join(", ")}` : entry.notes}
-                        </p>
-                      ) : null}
-                    </article>
-                  );
-                })}
+                {entries.slice(0, 3).map((entry) => (
+                  <HistoryItem key={entry._id} entry={entry} onDelete={handleDeleteEntry} />
+                ))}
                 {entries.length > 3 && (
                   <button
                     className="show-more-row-btn"
@@ -1466,52 +1453,9 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
               <p>Try a different filter or add your first reading.</p>
             </div>
           ) : (
-            filtered.map((entry) => {
-              const category = classifyReading(entry.systolic, entry.diastolic);
-              return (
-                <article className="history-item" key={entry._id}>
-                  <div className="history-item-top">
-                    <div>
-                      <div className="history-bp-row">
-                        <span className="history-bp">{entry.systolic}/{entry.diastolic}</span>
-                        <span className="history-bp-unit">mmHg</span>
-                      </div>
-                      <span className={`status-pill status-pill--${category.tone}`}>
-                        {category.label}
-                      </span>
-                    </div>
-                    <button
-                      className="ghost-button ghost-button--danger"
-                      onClick={() => onDelete(entry._id)}
-                      type="button"
-                    >
-                      Remove
-                    </button>
-                  </div>
-
-                  <div className="history-meta-grid">
-                    <div className="history-meta-box">
-                      <span className="history-meta-label">Date</span>
-                      <span className="history-meta-value">{formatDate(entry.recordedAt, { dateStyle: "short" })}</span>
-                    </div>
-                    <div className="history-meta-box">
-                      <span className="history-meta-label">Pulse</span>
-                      <span className="history-meta-value">{entry.pulse ?? "—"} bpm</span>
-                    </div>
-                    <div className="history-meta-box">
-                      <span className="history-meta-label">Medication</span>
-                      <span className="history-meta-value">{entry.medicationTaken ? "Taken" : "Missed"}</span>
-                    </div>
-                  </div>
-
-                  {(entry.symptoms?.length || entry.notes) ? (
-                    <p className="history-notes">
-                      {entry.symptoms?.length ? `Symptoms: ${entry.symptoms.join(", ")}` : entry.notes}
-                    </p>
-                  ) : null}
-                </article>
-              );
-            })
+            filtered.map((entry) => (
+              <HistoryItem key={entry._id} entry={entry} onDelete={onDelete} />
+            ))
           )}
         </div>
       </motion.div>
