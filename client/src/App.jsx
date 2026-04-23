@@ -1415,47 +1415,49 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
         role="dialog"
         aria-modal="true"
       >
-        <div className="sheet-handle-bar">
-          <div className="sheet-handle" onPointerDown={(e) => dragControls.start(e)} />
-        </div>
-
-        <div className="sheet-header">
-          <div>
-            <span className="eyebrow">Full history</span>
-            <h2 className="sheet-title">All readings</h2>
+        <div className="sheet-sticky">
+          <div className="sheet-handle-bar">
+            <div className="sheet-handle" onPointerDown={(e) => dragControls.start(e)} />
           </div>
-          <button className="sheet-close-btn" onClick={onClose} type="button" aria-label="Close">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-          </button>
-        </div>
 
-        <div className="sheet-filters">
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              className={`sheet-filter-tab${sheetFilter === f.id ? " sheet-filter-tab--active" : ""}`}
-              onClick={() => setSheetFilter(f.id)}
-              type="button"
-            >
-              {f.label}
+          <div className="sheet-header">
+            <div>
+              <span className="eyebrow">Full history</span>
+              <h2 className="sheet-title">All readings</h2>
+            </div>
+            <button className="sheet-close-btn" onClick={onClose} type="button" aria-label="Close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
-          ))}
-        </div>
-
-        {sheetFilter === "range" && (
-          <div className="sheet-date-range">
-            <div className="field">
-              <span>From</span>
-              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-            </div>
-            <div className="field">
-              <span>To</span>
-              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
-            </div>
           </div>
-        )}
 
-        <p className="sheet-count">{filtered.length} reading{filtered.length !== 1 ? "s" : ""}</p>
+          <div className="sheet-filters">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                className={`sheet-filter-tab${sheetFilter === f.id ? " sheet-filter-tab--active" : ""}`}
+                onClick={() => setSheetFilter(f.id)}
+                type="button"
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {sheetFilter === "range" && (
+            <div className="sheet-date-range">
+              <div className="field">
+                <span>From</span>
+                <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+              </div>
+              <div className="field">
+                <span>To</span>
+                <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          <p className="sheet-count">{filtered.length} reading{filtered.length !== 1 ? "s" : ""}</p>
+        </div>
 
         <div className="sheet-list">
           {filtered.length === 0 ? (
