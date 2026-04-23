@@ -1223,6 +1223,7 @@ function DashboardPage() {
               <div>
                 <span className="eyebrow">History</span>
                 <h3>Recent readings</h3>
+              </div>
             </div>
 
             {isLoading ? (
