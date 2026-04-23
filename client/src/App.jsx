@@ -1239,13 +1239,13 @@ function DashboardPage() {
                     <article className="history-item" key={entry._id}>
                       <div className="history-item-top">
                         <div>
-                          <span className={`status-pill status-pill--${category.tone}`}>
-                            {category.label}
-                          </span>
                           <div className="history-bp-row">
                             <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
                             <span className="history-bp-unit">mmHg</span>
                           </div>
+                          <span className={`status-pill status-pill--${category.tone}`}>
+                            {category.label}
+                          </span>
                         </div>
                         <button
                           className="ghost-button ghost-button--danger"
@@ -1472,13 +1472,13 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
                 <article className="history-item" key={entry._id}>
                   <div className="history-item-top">
                     <div>
-                      <span className={`status-pill status-pill--${category.tone}`}>
-                        {category.label}
-                      </span>
                       <div className="history-bp-row">
                         <p className="history-bp">{entry.systolic}/{entry.diastolic}</p>
                         <span className="history-bp-unit">mmHg</span>
                       </div>
+                      <span className={`status-pill status-pill--${category.tone}`}>
+                        {category.label}
+                      </span>
                     </div>
                     <button
                       className="ghost-button ghost-button--danger"

@@ -902,6 +902,10 @@ textarea {
   margin-top: 2px;
 }
 
+.history-item-top .status-pill {
+  margin-top: 6px;
+}
+
 .history-topline {
   display: flex;
   align-items: center;
