@@ -1095,9 +1095,7 @@ textarea {
   position: fixed;
   inset: 0;
   z-index: 1400;
-  background: rgba(55, 41, 47, 0.36);
-  backdrop-filter: blur(8px) saturate(0.9);
-  -webkit-backdrop-filter: blur(8px) saturate(0.9);
+  background: rgba(55, 41, 47, 0.42);
 }
 
 .history-sheet {
@@ -1112,9 +1110,11 @@ textarea {
   flex-direction: column;
   overflow: hidden;
   border-radius: 32px 32px 0 0;
-  background: linear-gradient(180deg, rgba(255, 252, 250, 0.98), rgba(255, 248, 245, 0.98));
+  background: rgb(255, 251, 249);
   border-top: 1px solid rgba(255, 255, 255, 0.72);
   box-shadow: 0 -20px 60px rgba(96, 64, 72, 0.22);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .sheet-handle-bar {
@@ -1237,8 +1237,11 @@ textarea {
   flex-direction: column;
   gap: 12px;
   padding: 16px 24px 40px;
-  overflow-y: auto;
+  overflow-y: scroll;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   flex: 1;
+  will-change: scroll-position;
 }
 
