@@ -890,8 +890,16 @@ textarea {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--ink-700);
-  margin-top: 4px;
   letter-spacing: 0.04em;
+  align-self: flex-end;
+  padding-bottom: 3px;
+}
+
+.history-bp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 2px;
 }
 
 .history-topline {
