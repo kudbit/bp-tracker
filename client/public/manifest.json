@@ -1,16 +1,38 @@
 {
-  "name": "PulseGlass Tracker",
+  "id": "/",
+  "name": "PulseGlass - Blood Pressure Tracker",
   "short_name": "PulseGlass",
-  "description": "A modern blood pressure tracker with medication, pulse, and wellness insights.",
+  "description": "A modern, calm blood pressure and pulse tracker with medication adherence logs, trend analysis, and PDF health reports.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#fff9f6",
   "theme_color": "#ffb4a2",
+  "categories": ["health", "medical", "lifestyle"],
   "icons": [
     {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/icon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
-      "sizes": "192x192 512x512 any",
       "purpose": "any maskable"
     }
   ]

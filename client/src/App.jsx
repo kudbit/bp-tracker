@@ -1,20 +1,9 @@
 import axios from "axios";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, lazy, Suspense } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ReferenceLine,
-  ReferenceArea,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
+const TrendChart = lazy(() => import("./components/TrendChart"));
 
 const TOKEN_KEY = "pulseglass_token";
 const api = axios.create({
@@ -203,11 +192,11 @@ function ProtectedRoute({ children }) {
 
   if (isBooting) {
     return (
-      <div className="app-stage">
+      <main className="app-stage">
         <div className="floating-orb floating-orb--left" />
         <div className="floating-orb floating-orb--right" />
         <div className="glass-panel loading-panel">Warming up your dashboard...</div>
-      </div>
+      </main>
     );
   }
 
@@ -263,7 +252,7 @@ function AuthPage({ mode }) {
   }
 
   return (
-    <div className="app-stage app-stage--auth">
+    <main className="app-stage app-stage--auth">
       <div className="floating-orb floating-orb--left" />
       <div className="floating-orb floating-orb--right" />
 
@@ -324,9 +313,12 @@ function AuthPage({ mode }) {
 
           <form className="auth-form" onSubmit={handleSubmit}>
             {mode === "register" ? (
-              <label className="field">
+              <label className="field" htmlFor="auth-name">
                 <span>Name</span>
                 <input
+                  id="auth-name"
+                  name="name"
+                  autoComplete="name"
                   required
                   placeholder="Aarav Singh"
                   value={form.name}
@@ -335,9 +327,12 @@ function AuthPage({ mode }) {
               </label>
             ) : null}
 
-            <label className="field">
+            <label className="field" htmlFor="auth-email">
               <span>Email</span>
               <input
+                id="auth-email"
+                name="email"
+                autoComplete="email"
                 required
                 type="email"
                 placeholder="you@example.com"
@@ -346,9 +341,12 @@ function AuthPage({ mode }) {
               />
             </label>
 
-            <label className="field">
+            <label className="field" htmlFor="auth-password">
               <span>Password</span>
               <input
+                id="auth-password"
+                name="password"
+                autoComplete={mode === "register" ? "new-password" : "current-password"}
                 required
                 minLength={6}
                 type="password"
@@ -389,7 +387,7 @@ function AuthPage({ mode }) {
           </p>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -412,6 +410,7 @@ function HistoryItem({ entry, onDelete }) {
           className="history-delete-btn"
           onClick={() => onDelete(entry._id)}
           type="button"
+          aria-label="Remove reading"
           title="Remove reading"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
@@ -541,6 +540,11 @@ function DashboardPage() {
     try {
       const response = await api.get("/entries/all");
       const { entries } = response.data;
+
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import("jspdf"),
+        import("jspdf-autotable"),
+      ]);
 
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       const pageW = doc.internal.pageSize.getWidth();
@@ -894,9 +898,11 @@ function DashboardPage() {
             </div>
 
             <form className="reading-form" onSubmit={handleCreateEntry}>
-              <label className="field">
+              <label className="field" htmlFor="entry-recordedAt">
                 <span>Date & time</span>
                 <input
+                  id="entry-recordedAt"
+                  name="recordedAt"
                   required
                   type="datetime-local"
                   value={form.recordedAt}
@@ -907,9 +913,11 @@ function DashboardPage() {
               </label>
 
               <div className="field-row">
-                <label className="field">
+                <label className="field" htmlFor="entry-systolic">
                   <span>Systolic</span>
                   <input
+                    id="entry-systolic"
+                    name="systolic"
                     required
                     min="60"
                     max="250"
@@ -922,9 +930,11 @@ function DashboardPage() {
                   />
                 </label>
 
-                <label className="field">
+                <label className="field" htmlFor="entry-diastolic">
                   <span>Diastolic</span>
                   <input
+                    id="entry-diastolic"
+                    name="diastolic"
                     required
                     min="40"
                     max="180"
@@ -939,9 +949,11 @@ function DashboardPage() {
               </div>
 
               <div className="field-row">
-                <label className="field">
+                <label className="field" htmlFor="entry-pulse">
                   <span>Pulse</span>
                   <input
+                    id="entry-pulse"
+                    name="pulse"
                     min="30"
                     max="220"
                     type="number"
@@ -953,9 +965,11 @@ function DashboardPage() {
                   />
                 </label>
 
-                <label className="field">
+                <label className="field" htmlFor="entry-medication">
                   <span>Medication</span>
                   <select
+                    id="entry-medication"
+                    name="medicationTaken"
                     value={form.medicationTaken}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -970,9 +984,11 @@ function DashboardPage() {
                 </label>
               </div>
 
-              <label className="field">
+              <label className="field" htmlFor="entry-symptoms">
                 <span>Symptoms</span>
                 <input
+                  id="entry-symptoms"
+                  name="symptoms"
                   placeholder="Headache, dizziness, fatigue"
                   value={form.symptoms}
                   onChange={(event) =>
@@ -981,9 +997,11 @@ function DashboardPage() {
                 />
               </label>
 
-              <label className="field">
+              <label className="field" htmlFor="entry-notes">
                 <span>Notes</span>
                 <textarea
+                  id="entry-notes"
+                  name="notes"
                   placeholder="Optional context like sleep, workout, stress, or hydration."
                   rows="4"
                   value={form.notes}
@@ -1026,197 +1044,9 @@ function DashboardPage() {
             </div>
 
             <div className="chart-wrap">
-              {summary?.trends?.length ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={summary.trends}
-                    margin={{ top: 12, right: 16, left: 0, bottom: 4 }}
-                  >
-                    <defs>
-                      {/* Systolic gradient — warm coral */}
-                      <linearGradient id="sysGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%"   stopColor="#FF9B86" stopOpacity={0.55} />
-                        <stop offset="50%"  stopColor="#FFB4A2" stopOpacity={0.22} />
-                        <stop offset="100%" stopColor="#FFB4A2" stopOpacity={0}    />
-                      </linearGradient>
-                      {/* Diastolic gradient — deep mauve */}
-                      <linearGradient id="diaGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%"   stopColor="#8B6471" stopOpacity={0.4}  />
-                        <stop offset="55%"  stopColor="#B5828C" stopOpacity={0.14} />
-                        <stop offset="100%" stopColor="#B5828C" stopOpacity={0}    />
-                      </linearGradient>
-                      {/* Glow filter for active dots */}
-                      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-                        <feMerge>
-                          <feMergeNode in="blur" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                      </filter>
-                    </defs>
-
-                    {/* ── Clinical reference zones ─────────────────────── */}
-                    {/* Normal systolic zone (below 120) */}
-                    <ReferenceArea
-                      y1={60}  y2={120}
-                      fill="rgba(93, 135, 99, 0.045)"
-                      strokeOpacity={0}
-                    />
-                    {/* Elevated systolic zone (120–130) */}
-                    <ReferenceArea
-                      y1={120} y2={130}
-                      fill="rgba(185, 122, 88, 0.055)"
-                      strokeOpacity={0}
-                    />
-                    {/* High systolic zone (130+) */}
-                    <ReferenceArea
-                      y1={130} y2={200}
-                      fill="rgba(166, 76, 93, 0.04)"
-                      strokeOpacity={0}
-                    />
-
-                    <CartesianGrid
-                      stroke="rgba(181, 130, 140, 0.12)"
-                      strokeDasharray="6 4"
-                      vertical={false}
-                    />
-
-                    <XAxis
-                      dataKey="label"
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={16}
-                      tick={{ fill: "#9A7480", fontSize: 11.5, fontWeight: 700, fontFamily: "Manrope, sans-serif" }}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={10}
-                      width={52}
-                      domain={["dataMin - 12", "dataMax + 12"]}
-                      tick={{ fill: "#9A7480", fontSize: 11.5, fontWeight: 700, fontFamily: "Manrope, sans-serif" }}
-                    />
-
-                    {/* ── Clinical reference lines ─────────────────────── */}
-                    <ReferenceLine
-                      y={120}
-                      stroke="rgba(185, 122, 88, 0.45)"
-                      strokeDasharray="5 4"
-                      strokeWidth={1.5}
-                      label={{ value: "120", position: "insideTopRight", fill: "#B97A58", fontSize: 10, fontWeight: 700, dy: -4 }}
-                    />
-                    <ReferenceLine
-                      y={80}
-                      stroke="rgba(93, 135, 99, 0.45)"
-                      strokeDasharray="5 4"
-                      strokeWidth={1.5}
-                      label={{ value: "80", position: "insideTopRight", fill: "#5d8763", fontSize: 10, fontWeight: 700, dy: -4 }}
-                    />
-
-                    {/* ── Custom Tooltip ───────────────────────────────── */}
-                    <Tooltip
-                      cursor={{ stroke: "rgba(181,130,140,0.25)", strokeWidth: 1.5, strokeDasharray: "4 3" }}
-                      content={({ active, payload, label }) => {
-                        if (!active || !payload?.length) return null;
-                        const sys = payload.find(p => p.dataKey === "avgSystolic")?.value;
-                        const dia = payload.find(p => p.dataKey === "avgDiastolic")?.value;
-                        const cat = sys && dia ? classifyReading(Math.round(sys), Math.round(dia)) : null;
-                        return (
-                          <div className="chart-tooltip">
-                            <p className="chart-tooltip__label">{label}</p>
-                            <div className="chart-tooltip__rows">
-                              <div className="chart-tooltip__row">
-                                <span className="chart-tooltip__swatch chart-tooltip__swatch--sys" />
-                                <span className="chart-tooltip__key">Systolic</span>
-                                <strong className="chart-tooltip__val">{sys ? Math.round(sys) : "--"}</strong>
-                                <span className="chart-tooltip__unit">mmHg</span>
-                              </div>
-                              <div className="chart-tooltip__row">
-                                <span className="chart-tooltip__swatch chart-tooltip__swatch--dia" />
-                                <span className="chart-tooltip__key">Diastolic</span>
-                                <strong className="chart-tooltip__val">{dia ? Math.round(dia) : "--"}</strong>
-                                <span className="chart-tooltip__unit">mmHg</span>
-                              </div>
-                            </div>
-                            {cat && (
-                              <span className={`status-pill status-pill--${cat.tone} chart-tooltip__pill`}>
-                                {cat.label}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      }}
-                    />
-
-                    {/* ── Systolic area ────────────────────────────────── */}
-                    <Area
-                      type="monotoneX"
-                      dataKey="avgSystolic"
-                      stroke="#FF9B86"
-                      strokeWidth={2.5}
-                      fill="url(#sysGradient)"
-                      dot={(props) => {
-                        const { cx, cy } = props;
-                        return (
-                          <circle
-                            key={`sys-dot-${cx}-${cy}`}
-                            cx={cx} cy={cy} r={4}
-                            fill="#fff"
-                            stroke="#FF9B86"
-                            strokeWidth={2.5}
-                          />
-                        );
-                      }}
-                      activeDot={(props) => {
-                        const { cx, cy } = props;
-                        return (
-                          <g key={`sys-active-${cx}`}>
-                            <circle cx={cx} cy={cy} r={10} fill="rgba(255,155,134,0.18)" />
-                            <circle cx={cx} cy={cy} r={6}  fill="#FF9B86" filter="url(#glow)" />
-                            <circle cx={cx} cy={cy} r={3}  fill="#fff" />
-                          </g>
-                        );
-                      }}
-                    />
-
-                    {/* ── Diastolic area ───────────────────────────────── */}
-                    <Area
-                      type="monotoneX"
-                      dataKey="avgDiastolic"
-                      stroke="#8B6471"
-                      strokeWidth={2.5}
-                      fill="url(#diaGradient)"
-                      dot={(props) => {
-                        const { cx, cy } = props;
-                        return (
-                          <circle
-                            key={`dia-dot-${cx}-${cy}`}
-                            cx={cx} cy={cy} r={4}
-                            fill="#fff"
-                            stroke="#8B6471"
-                            strokeWidth={2.5}
-                          />
-                        );
-                      }}
-                      activeDot={(props) => {
-                        const { cx, cy } = props;
-                        return (
-                          <g key={`dia-active-${cx}`}>
-                            <circle cx={cx} cy={cy} r={10} fill="rgba(139,100,113,0.18)" />
-                            <circle cx={cx} cy={cy} r={6}  fill="#8B6471" filter="url(#glow)" />
-                            <circle cx={cx} cy={cy} r={3}  fill="#fff" />
-                          </g>
-                        );
-                      }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="empty-state">
-                  <strong>No trend line yet.</strong>
-                  <p>Your chart will appear after your first saved reading.</p>
-                </div>
-              )}
+              <Suspense fallback={<div className="empty-state">Loading trend line...</div>}>
+                <TrendChart summary={summary} classifyReading={classifyReading} />
+              </Suspense>
             </div>
           </article>
         </section>
@@ -1432,14 +1262,14 @@ function HistoryBottomSheet({ entries, sheetFilter, setSheetFilter, dateFrom, se
 
           {sheetFilter === "range" && (
             <div className="sheet-date-range">
-              <div className="field">
+              <label className="field" htmlFor="sheet-dateFrom">
                 <span>From</span>
-                <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-              </div>
-              <div className="field">
+                <input id="sheet-dateFrom" name="dateFrom" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+              </label>
+              <label className="field" htmlFor="sheet-dateTo">
                 <span>To</span>
-                <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
-              </div>
+                <input id="sheet-dateTo" name="dateTo" type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+              </label>
             </div>
           )}
 

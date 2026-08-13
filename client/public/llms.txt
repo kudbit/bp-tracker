@@ -1,0 +1,7 @@
+# PulseGlass Blood Pressure & Health Tracker
+> Modern, calm blood pressure logging, medication tracking, trend analysis, and PDF report export.
+
+## Details
+- Application: PulseGlass
+- Purpose: Track blood pressure, pulse rate, medication adherence, symptoms, and mood.
+- Features: Interactive trend area charts, clinical reference threshold zones, PDF report generator, PWA offline support.

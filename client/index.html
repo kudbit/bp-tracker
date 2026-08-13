@@ -3,14 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseGlass - Personal Blood Pressure Tracker &amp; Health Insights</title>
+    
+    <!-- SEO & Metadata -->
     <meta
       name="description"
-      content="PulseGlass is a modern blood pressure tracker with medication, pulse, and wellness insights."
+      content="PulseGlass is a modern, calm blood pressure and pulse tracker with medication adherence logging, interactive trend charts, and PDF export capabilities."
     />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="PulseGlass Health" />
+    <link rel="canonical" href="http://localhost:5173/" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="PulseGlass - Blood Pressure Tracker" />
+    <meta
+      property="og:description"
+      content="Track blood pressure, pulse, and medication with a softer, calmer daily health space."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:url" content="http://localhost:5173/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PulseGlass - Blood Pressure Tracker" />
+    <meta
+      name="twitter:description"
+      content="Track blood pressure, pulse, and medication with a softer, calmer daily health space."
+    />
+
+    <!-- PWA & Mobile Icons -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#ffb4a2" />
-    <title>PulseGlass</title>
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- Performance: Preconnect & Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PulseGlass",
+        "url": "http://localhost:5173/",
+        "description": "Modern blood pressure tracker with medication, pulse, and wellness insights.",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "All",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -18,10 +72,11 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.error('ServiceWorker registration failed: ', err);
+          });
         });
       }
     </script>
   </body>
 </html>
-
