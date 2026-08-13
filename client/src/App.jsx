@@ -437,21 +437,20 @@ function LegalTermsModal({ onClose }) {
   }, [onClose]);
 
   return (
-    <>
-      <motion.div
-        className="sheet-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        aria-label="Close legal modal"
-      />
+    <motion.div
+      className="legal-modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
       <motion.div
         className="legal-modal-card"
-        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, y: 20 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="legal-modal-title"
@@ -513,7 +512,7 @@ function LegalTermsModal({ onClose }) {
           </button>
         </div>
       </motion.div>
-    </>
+    </motion.div>
   );
 }
 

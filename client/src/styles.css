@@ -1342,23 +1342,31 @@ textarea {
   opacity: 0.85;
 }
 
-.legal-modal-card {
+.legal-modal-overlay {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 32px);
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(55, 41, 47, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.legal-modal-card {
+  position: relative;
+  width: 100%;
   max-width: 580px;
   max-height: 85vh;
-  z-index: 1001;
+  margin: auto;
   display: flex;
   flex-direction: column;
   border-radius: 28px;
   border: 1px solid var(--glass-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 249, 246, 0.95));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 249, 246, 0.96));
   box-shadow: 0 32px 80px rgba(96, 64, 72, 0.28);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
   overflow: hidden;
 }
 
