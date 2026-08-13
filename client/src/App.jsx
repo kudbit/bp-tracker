@@ -210,6 +210,8 @@ function ProtectedRoute({ children }) {
 function AuthPage({ mode }) {
   const navigate = useNavigate();
   const { login, register, user } = useAuth();
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -234,6 +236,12 @@ function AuthPage({ mode }) {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+
+    if (mode === "register" && !acceptTerms) {
+      setError("Please agree to the Terms of Service and Medical Disclaimer to create an account.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -251,6 +259,10 @@ function AuthPage({ mode }) {
     }
   }
 
+  const isFormReady = mode === "register"
+    ? Boolean(form.name && form.email && form.password.length >= 6 && acceptTerms)
+    : Boolean(form.email && form.password.length >= 6);
+
   return (
     <main className="app-stage app-stage--auth">
       <div className="floating-orb floating-orb--left" />
@@ -264,7 +276,7 @@ function AuthPage({ mode }) {
           <div className="showcase-features">
             <div className="feature-item">
               <div className="feature-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
                   <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
                 </svg>
@@ -276,7 +288,7 @@ function AuthPage({ mode }) {
             </div>
             <div className="feature-item">
               <div className="feature-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
                   <polyline points="16 7 22 7 22 13" />
                 </svg>
@@ -288,12 +300,12 @@ function AuthPage({ mode }) {
             </div>
             <div className="feature-item">
               <div className="feature-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </div>
               <div className="feature-text">
-                <strong>Private & secure</strong>
+                <strong>Private &amp; secure</strong>
                 <p>Your health data is encrypted and kept entirely personal.</p>
               </div>
             </div>
@@ -358,16 +370,36 @@ function AuthPage({ mode }) {
               />
             </label>
 
+            {mode === "register" ? (
+              <div className="checkbox-field">
+                <input
+                  id="auth-terms"
+                  name="acceptTerms"
+                  type="checkbox"
+                  required
+                  checked={acceptTerms}
+                  onChange={(event) => setAcceptTerms(event.target.checked)}
+                />
+                <label htmlFor="auth-terms">
+                  I agree to the{" "}
+                  <button
+                    type="button"
+                    className="legal-link-btn"
+                    onClick={() => setShowTermsModal(true)}
+                  >
+                    Terms of Service &amp; Medical Disclaimer
+                  </button>{" "}
+                  and Privacy Policy.
+                </label>
+              </div>
+            ) : null}
+
             <div className="toast-container">
               {error ? <p className="form-error">{error}</p> : null}
             </div>
 
             <button
-              className={`primary-button ${
-                (mode === "register" ? form.name && form.email && form.password.length >= 6 : form.email && form.password.length >= 6)
-                  ? "primary-button--ready"
-                  : ""
-              }`}
+              className={`primary-button ${isFormReady ? "primary-button--ready" : ""}`}
               disabled={isSubmitting}
               type="submit"
             >
@@ -387,7 +419,101 @@ function AuthPage({ mode }) {
           </p>
         </section>
       </div>
+
+      <AnimatePresence>
+        {showTermsModal && (
+          <LegalTermsModal onClose={() => setShowTermsModal(false)} />
+        )}
+      </AnimatePresence>
     </main>
+  );
+}
+
+function LegalTermsModal({ onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <>
+      <motion.div
+        className="sheet-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        aria-label="Close legal modal"
+      />
+      <motion.div
+        className="legal-modal-card"
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="legal-modal-title"
+      >
+        <div className="legal-modal-header">
+          <div>
+            <span className="eyebrow">Legal &amp; Safety</span>
+            <h2 id="legal-modal-title">Terms of Service &amp; Medical Disclaimer</h2>
+          </div>
+          <button
+            className="sheet-close-btn"
+            onClick={onClose}
+            type="button"
+            aria-label="Close terms"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="legal-modal-body">
+          <section className="legal-section legal-section--warning">
+            <h3>⚠️ Important Medical Disclaimer</h3>
+            <p>
+              PulseGlass is a personal wellness tracking application intended solely for individual health self-monitoring and informational reference.
+            </p>
+            <p>
+              PulseGlass is <strong>not a certified medical device</strong> and does <strong>not provide medical diagnosis, clinical treatment advice, or emergency alert capabilities</strong>. Never disregard professional medical advice or delay seeking clinical care because of readings logged or trends viewed in PulseGlass. In the event of a medical emergency or hypertensive crisis, contact emergency services immediately.
+            </p>
+          </section>
+
+          <section className="legal-section">
+            <h3>1. Terms of Service</h3>
+            <p>
+              By creating an account and using PulseGlass, you agree to provide truthful information and keep your login credentials confidential. You are responsible for all health entries and notes submitted under your account.
+            </p>
+          </section>
+
+          <section className="legal-section">
+            <h3>2. Privacy Policy &amp; Data Protection</h3>
+            <p>
+              Your logged health metrics (systolic/diastolic blood pressure, pulse rate, medication adherence, mood, and symptoms) are private and securely stored exclusively for your authenticated account. We do not sell or share personal health data with third-party advertisers.
+            </p>
+          </section>
+
+          <section className="legal-section">
+            <h3>3. Data Ownership &amp; PDF Exports</h3>
+            <p>
+              You maintain complete ownership of your health records. You may export your reading timeline to PDF at any time or delete your logged entries directly from your personal dashboard.
+            </p>
+          </section>
+        </div>
+
+        <div className="legal-modal-footer">
+          <button className="primary-button primary-button--ready" onClick={onClose} type="button">
+            I Understand &amp; Agree
+          </button>
+        </div>
+      </motion.div>
+    </>
   );
 }
 
