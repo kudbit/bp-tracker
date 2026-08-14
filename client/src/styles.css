@@ -18,6 +18,7 @@
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: rgba(181, 130, 140, 0.28) transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :focus-visible {
@@ -75,6 +76,18 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+/* ── Touch optimization ───────────────────────────────────────── */
+a,
+button,
+[role="button"],
+input,
+select,
+textarea,
+label {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .app-stage {
@@ -397,6 +410,9 @@ textarea {
   cursor: pointer;
   font-weight: 800;
   transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .primary-button {
@@ -433,6 +449,12 @@ textarea {
 .primary-button:hover,
 .ghost-button:hover {
   transform: translateY(-2px);
+}
+
+.primary-button:active,
+.ghost-button:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
 }
 
 .primary-button:disabled,
@@ -958,11 +980,19 @@ textarea {
   color: var(--danger);
   cursor: pointer;
   transition: background 180ms ease, transform 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .history-delete-btn:hover {
   background: rgba(166, 76, 93, 0.16);
   transform: scale(1.05);
+}
+
+.history-delete-btn:active {
+  transform: scale(0.92);
+  background: rgba(166, 76, 93, 0.22);
+  transition-duration: 60ms;
 }
 
 .history-meta-row {
@@ -1024,11 +1054,18 @@ textarea {
   z-index: 50;
   transition: transform 250ms ease, box-shadow 250ms ease;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .export-fab:hover {
   transform: translateY(-4px) scale(1.04);
   box-shadow: 0 18px 40px rgba(181, 130, 140, 0.3);
+}
+
+.export-fab:active {
+  transform: scale(0.93);
+  transition-duration: 60ms;
 }
 
 .export-fab:disabled {
@@ -1099,6 +1136,45 @@ textarea {
   }
 }
 
+/* ── Touch-only devices: disable hover transforms ─────────────── */
+@media (hover: none) {
+  .primary-button:hover,
+  .ghost-button:hover {
+    transform: none;
+  }
+
+  .feature-item:hover {
+    transform: none;
+  }
+
+  .history-item:hover {
+    transform: none;
+    box-shadow: 0 8px 24px rgba(96, 64, 72, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.4));
+  }
+
+  .history-delete-btn:hover {
+    transform: none;
+  }
+
+  .show-more-btn:hover {
+    transform: none;
+  }
+
+  .sheet-filter-tab:hover {
+    transform: none;
+  }
+
+  .sheet-close-btn:hover {
+    transform: none;
+  }
+
+  .export-fab:hover {
+    transform: none;
+    box-shadow: 0 12px 30px rgba(181, 130, 140, 0.2);
+  }
+}
+
 /* ── Show-more buttons ─────────────────────────────────────────── */
 .show-more-btn {
   display: inline-flex;
@@ -1114,12 +1190,19 @@ textarea {
   cursor: pointer;
   transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .show-more-btn:hover {
   background: rgba(255, 255, 255, 0.78);
   border-color: rgba(181, 130, 140, 0.6);
   transform: translateY(-1px);
+}
+
+.show-more-btn:active {
+  transform: scale(0.96);
+  transition-duration: 60ms;
 }
 
 .show-more-row-btn {
@@ -1138,11 +1221,18 @@ textarea {
   cursor: pointer;
   transition: background 200ms ease, border-color 200ms ease;
   margin-top: 6px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .show-more-row-btn:hover {
   background: rgba(255, 255, 255, 0.55);
   border-color: rgba(181, 130, 140, 0.55);
+}
+
+.show-more-row-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 /* ── Bottom Sheet ──────────────────────────────────────────────── */
@@ -1224,11 +1314,18 @@ textarea {
   flex-shrink: 0;
   transition: background 180ms ease, transform 180ms ease;
   margin-top: 4px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .sheet-close-btn:hover {
   background: rgba(255, 255, 255, 0.9);
   transform: scale(1.06);
+}
+
+.sheet-close-btn:active {
+  transform: scale(0.92);
+  transition-duration: 60ms;
 }
 
 .sheet-filters {
@@ -1249,6 +1346,9 @@ textarea {
   cursor: pointer;
   transition: all 200ms ease;
   white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .sheet-filter-tab:hover {
@@ -1256,6 +1356,11 @@ textarea {
   border-color: rgba(181, 130, 140, 0.3);
   color: var(--ink-900);
   transform: translateY(-1px);
+}
+
+.sheet-filter-tab:active {
+  transform: scale(0.95);
+  transition-duration: 60ms;
 }
 
 .sheet-filter-tab--active {
@@ -1336,6 +1441,8 @@ textarea {
   text-underline-offset: 3px;
   cursor: pointer;
   transition: opacity 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .legal-link-btn:hover {
